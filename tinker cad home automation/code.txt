@@ -1,0 +1,89 @@
+
+#include <LiquidCrystal.h>
+
+int ledPin = 11;               
+int PIRpin = 8;            
+int pirState = LOW;            
+int val = 0;                    
+
+int photocellPin = 0;   
+int photocellReading;           
+
+LiquidCrystal lcd(2, 3, 4, 5, 6, 7);                        
+
+
+void setup() {  
+
+  pinMode(ledPin, OUTPUT);       
+  pinMode(PIRpin, INPUT);     
+  pinMode(photocellPin, INPUT);
+  
+  Serial.begin(9600);
+  lcd.begin(16, 2); 
+  lcd.setCursor(2, 0);                   
+  lcd.print("P.I.R Motion ");              
+  lcd.setCursor(0, 1);                     
+  lcd.print("and Light Sensors");      
+  delay(2000);                 
+                                                              
+	delay(2000);                         
+	lcd.clear();                           
+	lcd.setCursor(0, 0); 
+    lcd.print("Processing Data.");
+    delay(3000);
+    lcd.clear(); 
+	lcd.setCursor(3, 0);                 	
+	lcd.print("No Motion ");   
+	lcd.setCursor(3, 1); 
+	lcd.print("Waiting !");	
+  
+}
+
+void loop(){
+  val = digitalRead(PIRpin);  
+  photocellReading = analogRead(photocellPin);
+
+  if (val == HIGH) {           
+    digitalWrite(ledPin, HIGH); 
+    delay(150);
+
+		if (pirState == LOW) {
+		  Serial.println("Motion detected!");
+		  lcd.clear() ;
+		  lcd.setCursor(0, 0);             
+		  lcd.print("Motion Detected!");   
+		  lcd.setCursor(0, 1);             
+		  lcd.print(photocellReading);		  
+		  
+		  pirState = HIGH;
+          delay(5000) ;
+		}
+  } else {
+      digitalWrite(ledPin, LOW);
+
+	  scrollScreenSaver() ;
+      if (pirState == HIGH){
+		
+		  pirState = LOW;
+      }
+  }
+}
+
+void scrollScreenSaver() {
+	
+
+	lcd.clear() ;
+  	lcd.setCursor(15, 0);                 
+	lcd.print("No Motion ");   
+	lcd.setCursor(15, 1); 
+	lcd.print("Waiting !");	
+
+	
+    for (int positionCounter = 0; positionCounter < 22; positionCounter++) {
+
+		lcd.scrollDisplayLeft();
+		
+		delay(150);
+    
+	}
+}
